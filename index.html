@@ -181,7 +181,7 @@
                     this.group.add(
                         makeTube(meshes[i].position.clone(),
                             meshes[j].position.clone(),
-                            this.color, 0.04));
+                            this.color, 0.075));
                 })
 
                 // Within-page tubes (group-local positions)
@@ -189,7 +189,7 @@
                     this.group.add(
                         makeTube(meshes[i].position.clone(),
                             meshes[j].position.clone(),
-                            this.color, 0.04));
+                            this.color, 0.075));
                 });
 
                 return meshes;
@@ -224,7 +224,7 @@
             const a = new THREE.Vector3(), b = new THREE.Vector3();
             meshA.getWorldPosition(a);
             meshB.getWorldPosition(b);
-            scene.add(makeTube(a, b, color, 0.04));
+            scene.add(makeTube(a, b, color, 0.075));
         }
 
         // ── Pages ────────────────────────────────────────────────────────────
@@ -232,10 +232,10 @@
         // const turtlePage = new Page({y: 1.5, color: 0x00ff66}); // 0x33cc66
         // const sparqlPage = new Page({y: 3.0, color: 0x00bbff}); // 0x3399ff
 
-        const otherPage = new Page({y: 0, color: 0x62e9f5}); // 0x3399ff
-        const jsonPage = new Page({y: 1.7, color: 0xf5e262}); // 0xffaa22
-        const turtlePage = new Page({y: 3.4, color: 0x759ca0}); // 0x33cc66
-        const sparqlPage = new Page({y: 5.1, color: 0xf562b6}); // 0x3399ff
+        const otherPage = new Page({y: 0, color: 0x56B4E9}); // base / system (sky blue)
+        const jsonPage = new Page({y: 1.7, color: 0xE69F00}); // JSON-LD (amber)
+        const turtlePage = new Page({y: 3.4, color: 0x009E73}); // Turtle (green)
+        const sparqlPage = new Page({y: 5.1, color: 0xCC79A7}); // SPARQL (violet)
 
         const get_points = (point_count, rot) => [...new Array(point_count)].map((_, i) => {
             let angle = i * 2 * Math.PI / point_count;
@@ -275,10 +275,10 @@
         // ── Format labels (async font) ───────────────────────────────────────
         (async () => {
             const font = await new FontLoader().loadAsync('./fonts/helvetiker_bold.typeface.json');
-            jsonPage.addLabel(font, 'JSON-LD');
-            turtlePage.addLabel(font, 'Turtle');
             sparqlPage.addLabel(font, 'SPARQL');
-            otherPage.addLabel(font, " . . .")
+            turtlePage.addLabel(font, 'Turtle');
+            jsonPage.addLabel(font, 'JSON-LD');
+            otherPage.addLabel(font, "> SWLS")
         })();
 
         // ── Resize ───────────────────────────────────────────────────────────
