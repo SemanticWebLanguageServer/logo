@@ -1,0 +1,10 @@
+{
+  "name": "swls-logo",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

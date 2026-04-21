@@ -1,0 +1,67 @@
+name: Generate logo assets
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q \
+            libgbm-dev libnss3 libatk1.0-0 libatk-bridge2.0-0 \
+            libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
+            libxdamage1 libxfixes3 libxrandr2 libpango-1.0-0 \
+            libcairo2 libasound2 imagemagick
+
+      - run: npm ci
+
+      - name: Render PNGs
+        run: |
+          node generate.js --output logo-1920x1080.png --width 1920 --height 1080
+          node generate.js --output logo-256.png       --width 256  --height 256
+          node generate.js --output logo-128.png       --width 128  --height 128
+          node generate.js --output logo-64.png        --width 64   --height 64
+          node generate.js --output logo-48.png        --width 48   --height 48
+          node generate.js --output logo-32.png        --width 32   --height 32
+          node generate.js --output logo-16.png        --width 16   --height 16
+
+      - name: Bundle favicon.ico
+        run: convert logo-16.png logo-32.png logo-48.png logo-64.png logo-128.png favicon.ico
+
+      - name: Prepare Pages directory
+        run: |
+          mkdir _site
+          cp index.html favicon.ico logo-*.png _site/
+          cp -r fonts _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
