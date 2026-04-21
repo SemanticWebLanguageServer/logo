@@ -34,7 +34,7 @@ jobs:
 
       - name: Render PNGs
         run: |
-          node generate.js --output logo-1920x1080.png --width 1920 --height 1080
+          node generate.js --output logo-1024.png      --width 1024 --height 1024
           node generate.js --output logo-256.png       --width 256  --height 256
           node generate.js --output logo-128.png       --width 128  --height 128
           node generate.js --output logo-64.png        --width 64   --height 64
