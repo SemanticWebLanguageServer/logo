@@ -32,13 +32,15 @@
         import {LineMaterial} from 'three/addons/lines/LineMaterial.js';
         import {LineGeometry} from 'three/addons/lines/LineGeometry.js';
 
+        const lineMaterials = [];
+
         // ── Scene ────────────────────────────────────────────────────────────
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xffffff);
         scene.fog = new THREE.FogExp2(0x1a1a2e, 0.035);
 
         const aspect = window.innerWidth / window.innerHeight;
-        const size = 5;
+        const size = 4;
         const camera = new THREE.OrthographicCamera(
             -size * aspect, // left
             size * aspect,  // right
@@ -48,7 +50,7 @@
             1000            // far
         );
         camera.position.set(-6, 8, 15);
-        camera.lookAt(0, 5, 0);
+        camera.lookAt(0, 2.55, 0);
 
         const renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(innerWidth, innerHeight);
@@ -56,7 +58,7 @@
         document.body.appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(0, 1.5, 0);
+        controls.target.set(0, 2.55, 0);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
         controls.update();
@@ -148,13 +150,15 @@
                     -3, 0.01, 3,
                     -3, 0.01, -3,  // close the loop
                 ]);
-                const border = new Line2(borderGeo, new LineMaterial({
+                const borderMat = new LineMaterial({
                     color,
-                    linewidth: 10,
+                    linewidth: Math.min(window.innerWidth, window.innerHeight) / 50,
                     transparent: true,
-                    opacity: 0.8,
+                    opacity: 1,
                     resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
-                }));
+                });
+                lineMaterials.push(borderMat);
+                const border = new Line2(borderGeo, borderMat);
                 this.group.add(border);
             }
 
@@ -280,15 +284,23 @@
             sparqlPage.addLabel(font, 'SWLS', 1.4, 0.3);
             turtlePage.addLabel(font, 'Turtle');
             jsonPage.addLabel(font, 'JSON-LD');
-            otherPage.addLabel(font, "SPARQL")
+            otherPage.addLabel(font, "SPARQL");
+            // Signal for headless screenshot
+            requestAnimationFrame(() => {window.sceneReady = true;});
         })();
 
-        // ── Resize ───────────────────────────────────────────────────────────
-        window.addEventListener('resize', () => {
-            camera.aspect = innerWidth / innerHeight;
+        function onResize() {
+            const w = innerWidth, h = innerHeight, aspect = w / h;
+            camera.left = -size * aspect;
+            camera.right = size * aspect;
             camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
+            renderer.setSize(w, h);
+            const lw = Math.min(w, h) / 100;
+            lineMaterials.forEach(m => {m.resolution.set(w, h); m.linewidth = lw;});
+        }
+
+        // ── Resize ───────────────────────────────────────────────────────────
+        window.addEventListener('resize', onResize);
 
         // ── Render loop ──────────────────────────────────────────────────────
         function animate() {
