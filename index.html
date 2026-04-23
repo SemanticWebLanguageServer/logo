@@ -63,6 +63,13 @@
         controls.dampingFactor = 0.08;
         controls.update();
 
+        const CYCLE_PERIOD = 3000;   // ms per full rotation
+        const easeInOut = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        let cycleStart = null;
+        let direction = 1;
+        let baseAngle = 0;
+        const pageStart = performance.now();
+
         let [x, y, z] = [2, -3, 6];
         // Lights
         scene.add(new THREE.AmbientLight(0xffffff, 5.8));
@@ -75,15 +82,6 @@
         // pl1.position.z = z;
         // scene.add(pl1);
         //
-        let geo = new THREE.SphereGeometry(0.28, 15, 15);
-
-        let color = 0xffffff;
-        const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-            color, roughness: 1, metalness: 0.0,
-            emissive: color, emissiveIntensity: 0.65,
-        }));
-        mesh.position.set(x, y, z);
-        scene.add(mesh);
 
         // const pl2 = new THREE.PointLight(0x00ffff, 4.0, 40);
         // pl2.position.set(6, 4, -4);
@@ -302,13 +300,24 @@
         // ── Resize ───────────────────────────────────────────────────────────
         window.addEventListener('resize', onResize);
 
+
+
         // ── Render loop ──────────────────────────────────────────────────────
-        function animate() {
+        function animate(now) {
             requestAnimationFrame(animate);
             controls.update();
+            if (cycleStart === null) cycleStart = now + 1000;
+            const elapsed = now - cycleStart;
+            if (elapsed >= CYCLE_PERIOD) {
+                baseAngle += direction * 2 * Math.PI;
+                direction *= -1;
+                cycleStart = now + 1000;
+            }
+            const p = Math.min(Math.max((elapsed), 0) / CYCLE_PERIOD, 1);
+            scene.rotation.y = baseAngle + direction * easeInOut(p) * 2 * Math.PI;
             renderer.render(scene, camera);
         }
-        animate();
+        animate(performance.now());
     </script>
 </body>
 
