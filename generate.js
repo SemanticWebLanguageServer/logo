@@ -45,7 +45,7 @@ await page.setViewport({ width, height, deviceScaleFactor: 1 });
 await page.goto(`http://127.0.0.1:${port}/`);
 await page.waitForFunction('window.sceneReady === true', { timeout });
 
-await page.screenshot({ path: output, omitBackground: false });
+await page.screenshot({ path: output, omitBackground: true });
 console.log(`Saved ${output} (${width}x${height})`);
 
 await browser.close();

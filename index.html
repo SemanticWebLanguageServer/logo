@@ -15,7 +15,6 @@
     <style>
         body {
             margin: 0;
-            background: #1a1a2e;
         }
 
         canvas {
@@ -37,7 +36,7 @@
 
         // ── Scene ────────────────────────────────────────────────────────────
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xffffff);
+        // scene.background = null;
         scene.fog = new THREE.FogExp2(0x1a1a2e, 0.035);
 
         const aspect = window.innerWidth / window.innerHeight;
@@ -53,7 +52,7 @@
         camera.position.set(-6, 8, 15);
         camera.lookAt(0, 2.55, 0);
 
-        const renderer = new THREE.WebGLRenderer({antialias: true});
+        const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
         renderer.setSize(innerWidth, innerHeight);
         renderer.setPixelRatio(devicePixelRatio);
         document.body.appendChild(renderer.domElement);
